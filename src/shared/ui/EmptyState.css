@@ -1,0 +1,17 @@
+.empty {
+  display: grid;
+  gap: 4px;
+  padding: 24px 18px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.empty__title {
+  font-weight: 600;
+}
+
+.empty__hint {
+  color: var(--muted);
+  font-size: 0.95rem;
+}

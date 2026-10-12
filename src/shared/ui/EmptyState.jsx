@@ -1,9 +1,10 @@
-// title показывается всегда, hint только если его передали
+import "./EmptyState.css"
+
 export function EmptyState({title, hint}){
     return (
-        <div>
-            <p>{title}</p>
-            {hint && <p>{hint}</p>}
+        <div className="empty">
+            <p className="empty__title">{title}</p>
+            {hint && <p className="empty__hint">{hint}</p>}
         </div>
     )
 }

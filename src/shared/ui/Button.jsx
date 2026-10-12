@@ -1,6 +1,8 @@
-export function Button({children, onClick, type = 'button', disabled = false}){
+import "./Button.css"
+
+export function Button({children, onClick, type = 'button', disabled = false, variant = 'primary'}){
     return(
-        <button type = {type} onClick={onClick}
+        <button className={`btn btn--${variant}`} type = {type} onClick={onClick}
         disabled={disabled}>{children}</button>
     )
 }
