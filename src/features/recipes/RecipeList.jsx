@@ -20,13 +20,11 @@ export function RecipeList({status, recipes, error, onRetry, userIngredients}){
         <section className="recipes">
             {recipes.map((recipe)=>
             <RecipeCard
-            // key должен быть уникальным и не меняться, поэтому берём id, а не индекс
             key = {recipe.id}
-            // слева имя props для RecipeCard, справа значение из объекта recipe
+            id={recipe.id}
             title={recipe.title}
-            time={recipe.time}
-            description = {recipe.description}
-            ingredients={recipe.ingredients}
+            thumb={recipe.thumb}
+            matched={recipe.matched}
             userIngredients={userIngredients}
             />
             )}

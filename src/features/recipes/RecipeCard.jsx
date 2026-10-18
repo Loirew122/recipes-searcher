@@ -1,15 +1,37 @@
-export function RecipeCard({ title, time, description, ingredients, userIngredients }) {
-  const have = userIngredients.map((item)=> item.toLowerCase())
-  const missing = ingredients.filter((item)=>!have.includes(item))
+import { useState } from "react"
+import { Button } from "@shared/ui/Button"
+import { Loader } from "@shared/ui/Loader"
+import { toEnglish, toRussian } from "@shared/lib/ingredients"
+import { useRecipeDetails } from "./useRecipeDetails"
+
+export function RecipeCard({ id, title, thumb, matched, userIngredients }) {
+  const [open, setOpen] = useState(false)
+  const { ingredients, status, reload } = useRecipeDetails(id, open)
+
+  // есть ли у пользователя ингредиент блюда: "egg" совпадает и с "egg yolks"
+  const have = userIngredients.map(toEnglish)
+  const missing = (ingredients ?? []).filter((item) => !have.some((h) => item.includes(h)))
+
   return (
     <article className="recipe-card">
+      <img className="recipe-card__image" src={thumb} alt={title} loading="lazy" />
       <h3 className="recipe-card__title">{title}</h3>
-      <p className="recipe-card__time">{time} мин</p>
-      <p className="recipe-card__description">{description}</p>
-      <p className="recipe-card__composition">Состав: {ingredients.join(', ')}</p>
-      {missing.length === 0 ?
-       <p className="recipe-card__status recipe-card__status--ready">Всё есть, можно готовить</p>
-       : <p className="recipe-card__status recipe-card__status--missing">Не хватает: {missing.join(', ')}</p>}
+      {matched.length > 0 && <p className="recipe-card__matched">Подходит по: {matched.join(', ')}</p>}
+      <Button variant="secondary" onClick={() => setOpen(!open)}>
+        {open ? 'Скрыть состав' : 'Показать состав'}
+      </Button>
+      {open && status === 'loading' && <Loader text="Загружаем состав..." />}
+      {open && status === 'error' && (
+        <div className="recipe-card__details">
+          <p className="recipe-card__status recipe-card__status--missing">Не удалось загрузить состав</p>
+          <Button variant="secondary" onClick={reload}>Повторить</Button>
+        </div>
+      )}
+      {open && status === 'success' && (
+        missing.length === 0
+          ? <p className="recipe-card__status recipe-card__status--ready">Всё есть, можно готовить</p>
+          : <p className="recipe-card__status recipe-card__status--missing">Не хватает: {missing.map(toRussian).join(', ')}</p>
+      )}
     </article>
   )
 }
