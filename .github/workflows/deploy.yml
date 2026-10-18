@@ -30,6 +30,7 @@ jobs:
       - run: npm run build
         env:
           VITE_BASE: /${{ github.event.repository.name }}/
+          VITE_API_URL: https://www.themealdb.com/api/json/v1/1
 
       - uses: actions/configure-pages@v5
 
