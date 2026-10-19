@@ -3,7 +3,6 @@ import { Button } from "@shared/ui/Button";
 import { Loader } from "@shared/ui/Loader";
 import { EmptyState } from "@shared/ui/EmptyState";
 import "./recipes.css";
-// компонент внутри компонента: для каждого объекта из recipes рендерим свою RecipeCard
 export function RecipeList({status, recipes, error, onRetry, userIngredients}){
     if (status === 'idle') return <EmptyState title = 'Добавьте продукты и нажмите "Найти рецепты"'></EmptyState>
     if (status === 'loading') return <Loader />

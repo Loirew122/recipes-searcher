@@ -8,7 +8,6 @@ export function RecipeCard({ id, title, thumb, matched, userIngredients }) {
   const [open, setOpen] = useState(false)
   const { ingredients, status, reload } = useRecipeDetails(id, open)
 
-  // есть ли у пользователя ингредиент блюда: "egg" совпадает и с "egg yolks"
   const have = userIngredients.map(toEnglish)
   const missing = (ingredients ?? []).filter((item) => !have.some((h) => item.includes(h)))
 

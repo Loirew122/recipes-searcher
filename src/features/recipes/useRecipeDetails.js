@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { getRecipeIngredients } from "./recipesApi"
 
-// enabled: состав загружаем только когда карточку раскрыли
 export function useRecipeDetails(id, enabled) {
     const [ingredients, setIngredients] = useState(null)
     const [error, setError] = useState('')
