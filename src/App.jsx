@@ -1,32 +1,25 @@
-import {IngredientList}  from "@features/ingredients/IngredientList.jsx"
-import { IngredientForm } from "@features/ingredients/IngredientForm.jsx"
-import { RecipeList } from "@features/recipes/RecipeList"
-import { useIngredients } from "@features/ingredients/useIngredients.js"
-import { useRecipeSearch } from "@features/recipes/useRecipeSearch.js"
-import { Button } from "@shared/ui/Button.jsx"
+import { NavLink, Outlet } from "react-router-dom"
+import { useSelector } from "react-redux"
+import { selectIngredients } from "@features/ingredients/IngredientsSlice.js"
+import { useGetFavoritesQuery } from "@/app/api"
 import "./App.css"
 
-
 function App(){
-
-  const {ingredients, error, addIngredienst,  removeIngredient} = useIngredients();
-  const { status, foundRecipes, searchError, search, reload } = useRecipeSearch()
+  const ingredients = useSelector(selectIngredients)
+  const { data: favorites = [] } = useGetFavoritesQuery()
 
   return (
     <main className="app">
       <header className="app__header">
         <h1>Придумывалка рецептов</h1>
+        <nav className="app__nav">
+          <NavLink to="/" end>Поиск</NavLink>
+          {" "}
+          <NavLink to="/favorites">Избранное ({favorites.length})</NavLink>
+        </nav>
         <p className="app__counter">Продуктов: {ingredients.length}</p>
       </header>
-      <section className="panel">
-        <IngredientForm onAdd = {addIngredienst} error = {error}/>
-        <IngredientList items = {ingredients} onRemove={removeIngredient}/>
-        <Button onClick={() => search(ingredients)}
-        disabled={ingredients.length === 0 || status ==='loading'}>
-          Найти рецепты</Button>
-      </section>
-      <RecipeList status = {status} recipes={foundRecipes}
-      error = {searchError} onRetry={reload} userIngredients={ingredients}/>
+      <Outlet />
     </main>
   )
 }

@@ -56,3 +56,36 @@
     padding: 18px;
   }
 }
+
+.app__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.app__nav a {
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.app__nav a:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.app__nav a.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.back-link {
+  justify-self: start;
+  font-weight: 600;
+}

@@ -28,14 +28,20 @@ export async function searchRecipes(userIngredients, signal) {
     })
     return [...byId.values()].sort((a, b) => b.matched.length - a.matched.length)
 }
-export async function getRecipeIngredients(id, signal) {
+export async function getRecipe(id, signal) {
     const response = await httpClient.get("/lookup.php", { params: { i: id }, signal })
     const meal = response.data.meals?.[0]
-    if (!meal) return []
-    const result = []
+    if (!meal) return null
+    const ingredients = []
     for (let n = 1; n <= 20; n++) {
         const name = meal[`strIngredient${n}`]
-        if (name && name.trim()) result.push(name.trim().toLowerCase())
+        if (name && name.trim()) ingredients.push(name.trim().toLowerCase())
     }
-    return result
+    return {
+        id: meal.idMeal,
+        title: meal.strMeal,
+        thumb: meal.strMealThumb,
+        instructions: meal.strInstructions,
+        ingredients,
+    }
 }
