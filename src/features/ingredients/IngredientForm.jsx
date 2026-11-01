@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Button } from "@shared/ui/Button"
+import { Icon } from "@shared/ui/Icon"
 import { Input } from "@shared/ui/Input"
 import { addIngredient, selectIngredients, selectIngredientsError } from "./IngredientsSlice"
 import "./ingredients.css"
@@ -20,9 +21,13 @@ export function IngredientForm(){
     }
     return(
         <form className="ingredient-form" onSubmit={handleSubmit}>
-            <Input value = {draft} placeholder="Например, яйца"
-            onChange={setDraft}></Input>
-            <Button type="submit" >Добавить</Button>
+            <label className="ingredient-form__field">
+                <span className="visually-hidden">Продукт</span>
+                <Icon name="carrot" />
+                <Input value = {draft} placeholder="Например, яйца"
+                onChange={setDraft}></Input>
+            </label>
+            <Button type="submit"><Icon name="plus" />Добавить</Button>
             {error && <p className="form-error" role="alert">{error}</p>}
         </form>
     )

@@ -1,35 +1,42 @@
 import { Link } from "react-router-dom"
-import { Button } from "@shared/ui/Button"
-import { Loader } from "@shared/ui/Loader"
+import { ErrorBox } from "@shared/ui/ErrorBox"
 import { EmptyState } from "@shared/ui/EmptyState"
-import { FavoriteButton } from "@features/favorites/FavoriteButton"
+import { plural } from "@shared/lib/plural"
+import { RecipeCard } from "@features/recipes/RecipeCard"
+import { RecipeGridSkeleton } from "@features/recipes/RecipeList"
 import { useGetFavoritesQuery } from "@/app/api"
 
 export function FavoritesPage() {
   const { data: favorites = [], isLoading, isError, error, refetch } = useGetFavoritesQuery()
 
-  if (isLoading) return <Loader text="Загружаем избранное..." />
-  if (isError) {
-    return (
-      <div className="error-box" role="alert">
-        <p>{error.message}</p>
-        <Button variant="secondary" onClick={refetch}>Повторить</Button>
-      </div>
+  let content
+  if (isLoading) content = <RecipeGridSkeleton count={4} />
+  else if (isError) content = <ErrorBox message={error.message} onRetry={refetch} />
+  else if (favorites.length === 0) {
+    content = (
+      <EmptyState icon="heart" title="В избранном пусто" hint="Нажмите на сердечко у рецепта, чтобы сохранить его здесь">
+        <Link to="/" className="btn btn--primary">Найти рецепты</Link>
+      </EmptyState>
     )
-  }
-  if (favorites.length === 0) {
-    return <EmptyState title="В избранном пусто" hint="Добавьте рецепты на странице поиска" />
+  } else {
+    content = (
+      <section className="recipes">
+        {favorites.map((item, index) => (
+          <RecipeCard key={item.id} index={index} id={item.id} title={item.title} thumb={item.thumb} />
+        ))}
+      </section>
+    )
   }
 
   return (
-    <section className="recipes">
-      {favorites.map((item) => (
-        <article className="recipe-card" key={item.id}>
-          <img className="recipe-card__image" src={item.thumb} alt={item.title} loading="lazy" />
-          <h3 className="recipe-card__title"><Link to={`/recipe/${item.id}`}>{item.title}</Link></h3>
-          <FavoriteButton id={item.id} title={item.title} thumb={item.thumb} />
-        </article>
-      ))}
-    </section>
+    <div className="page">
+      <header className="page-head">
+        <h1>Избранное</h1>
+        {favorites.length > 0 && (
+          <p>Сохранено {favorites.length} {plural(favorites.length, ["рецепт", "рецепта", "рецептов"])}</p>
+        )}
+      </header>
+      {content}
+    </div>
   )
 }

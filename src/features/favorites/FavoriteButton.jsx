@@ -1,7 +1,9 @@
 import { Button } from "@shared/ui/Button"
+import { Icon } from "@shared/ui/Icon"
 import { useAddFavoriteMutation, useGetFavoritesQuery, useRemoveFavoriteMutation } from "@/app/api"
+import "./favorites.css"
 
-export function FavoriteButton({ id, title, thumb }) {
+export function FavoriteButton({ id, title, thumb, compact = false }) {
     const { data: favorites = [], isLoading } = useGetFavoritesQuery()
     const [addFavorite, add] = useAddFavoriteMutation()
     const [removeFavorite, remove] = useRemoveFavoriteMutation()
@@ -9,6 +11,7 @@ export function FavoriteButton({ id, title, thumb }) {
     const isFavorite = favorites.some((item) => item.id === id)
     const pending = add.isLoading || remove.isLoading
     const error = add.error ?? remove.error
+    const label = isFavorite ? "Убрать из избранного" : "В избранное"
 
     function handleClick() {
         if (isFavorite) removeFavorite(id)
@@ -16,11 +19,22 @@ export function FavoriteButton({ id, title, thumb }) {
     }
 
     return (
-        <div>
-            <Button variant="secondary" onClick={handleClick} disabled={pending || isLoading}>
-                {pending ? "Сохраняем..." : isFavorite ? "Убрать из избранного" : "В избранное"}
-            </Button>
-            {error && <p className="form-error" role="alert">{error.message}</p>}
+        <div className={`favorite${compact ? " favorite--compact" : ""}`}>
+            {compact
+                ? (
+                    <Button variant="fav" onClick={handleClick} disabled={pending || isLoading}
+                        aria-pressed={isFavorite} aria-label={label} title={label}>
+                        <Icon name="heart" size={20} filled={isFavorite} />
+                    </Button>
+                )
+                : (
+                    <Button variant="secondary" onClick={handleClick} disabled={pending || isLoading}
+                        aria-pressed={isFavorite}>
+                        <Icon name="heart" filled={isFavorite} />
+                        {pending ? "Сохраняем..." : label}
+                    </Button>
+                )}
+            {error && <p className="favorite__error" role="alert">{error.message}</p>}
         </div>
     )
 }

@@ -3,12 +3,14 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 11px 20px;
+  padding: 12px 20px;
   border: 1px solid transparent;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background 0.15s, transform 0.15s, box-shadow 0.15s, color 0.15s;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .btn:focus-visible {
@@ -21,15 +23,22 @@
   cursor: not-allowed;
 }
 
+.btn[aria-busy="true"]:disabled {
+  opacity: 0.85;
+  cursor: progress;
+}
+
 .btn--primary {
   background: var(--primary);
   color: var(--on-primary);
-  box-shadow: 0 4px 12px rgba(47, 125, 79, 0.28);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
 .btn--primary:hover:not(:disabled) {
   background: var(--primary-hover);
+  color: var(--on-primary);
   transform: translateY(-1px);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 34%, transparent);
 }
 
 .btn--primary:active:not(:disabled) {
@@ -37,26 +46,95 @@
 }
 
 .btn--secondary {
-  background: transparent;
+  background: var(--surface);
   color: var(--primary);
-  border-color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
 }
 
 .btn--secondary:hover:not(:disabled) {
+  border-color: var(--primary);
   background: var(--ok-soft);
 }
 
+.btn--secondary[aria-pressed="true"] .icon {
+  color: var(--heart);
+}
+
+.btn--ghost {
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--primary);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--ok-soft);
+  color: var(--primary);
+}
+
+.btn[aria-expanded="true"] .icon {
+  transform: rotate(180deg);
+}
+
 .btn--icon {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   background: transparent;
-  color: var(--muted);
-  font-size: 1.1rem;
-  line-height: 1;
+  color: currentColor;
+  opacity: 0.7;
 }
 
 .btn--icon:hover:not(:disabled) {
   background: var(--danger-soft);
   color: var(--danger);
+  opacity: 1;
+}
+
+.btn--fav {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--text);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(6px);
+}
+
+.btn--fav:hover:not(:disabled) {
+  color: var(--heart);
+  transform: scale(1.08);
+}
+
+.btn--fav[aria-pressed="true"] {
+  color: var(--heart);
+}
+
+.btn--fav[aria-pressed="true"] .icon {
+  animation: heart-pop 0.35s ease;
+}
+
+.btn--fav:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+.btn__spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 0.7s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes heart-pop {
+  50% {
+    transform: scale(1.3);
+  }
 }

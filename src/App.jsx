@@ -1,7 +1,9 @@
-import { NavLink, Outlet } from "react-router-dom"
+import { Link, NavLink, Outlet } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { selectIngredients } from "@features/ingredients/IngredientsSlice.js"
 import { useGetFavoritesQuery } from "@/app/api"
+import { Icon } from "@shared/ui/Icon"
+import { plural } from "@shared/lib/plural"
 import "./App.css"
 
 function App(){
@@ -9,18 +11,33 @@ function App(){
   const { data: favorites = [] } = useGetFavoritesQuery()
 
   return (
-    <main className="app">
-      <header className="app__header">
-        <h1>Придумывалка рецептов</h1>
-        <nav className="app__nav">
-          <NavLink to="/" end>Поиск</NavLink>
-          {" "}
-          <NavLink to="/favorites">Избранное ({favorites.length})</NavLink>
-        </nav>
-        <p className="app__counter">Продуктов: {ingredients.length}</p>
+    <div className="app">
+      <header className="topbar">
+        <div className="topbar__inner">
+          <Link to="/" className="brand">
+            <span className="brand__logo"><Icon name="chef" size={22} /></span>
+            Придумывалка рецептов
+          </Link>
+          <nav className="app__nav">
+            <NavLink to="/" end><Icon name="search" />Поиск</NavLink>
+            <NavLink to="/favorites">
+              <Icon name="heart" />Избранное
+              {favorites.length > 0 && <span className="app__badge">{favorites.length}</span>}
+            </NavLink>
+            <span className="app__counter" title="Продуктов в списке">
+              <Icon name="carrot" size={16} />
+              {ingredients.length} {plural(ingredients.length, ["продукт", "продукта", "продуктов"])}
+            </span>
+          </nav>
+        </div>
       </header>
-      <Outlet />
-    </main>
+      <main className="app__main">
+        <Outlet />
+      </main>
+      <footer className="app__footer">
+        Рецепты и фотографии — <a href="https://www.themealdb.com" target="_blank" rel="noreferrer">TheMealDB</a>
+      </footer>
+    </div>
   )
 }
 
