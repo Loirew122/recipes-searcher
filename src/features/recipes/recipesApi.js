@@ -33,15 +33,27 @@ export async function getRecipe(id, signal) {
     const meal = response.data.meals?.[0]
     if (!meal) return null
     const ingredients = []
+    const measures = []
     for (let n = 1; n <= 20; n++) {
         const name = meal[`strIngredient${n}`]
-        if (name && name.trim()) ingredients.push(name.trim().toLowerCase())
+        if (name && name.trim()) {
+            ingredients.push(name.trim().toLowerCase())
+            measures.push(meal[`strMeasure${n}`]?.trim() ?? "")
+        }
     }
+    const steps = (meal.strInstructions ?? "")
+        .split(/\r?\n/)
+        .map((line) => line.trim().replace(/^([-–•▢*]|step\s*\d+[.):]?|\d+[.)])\s*/i, ""))
+        .filter((line) => line && line !== line.toUpperCase())
     return {
         id: meal.idMeal,
         title: meal.strMeal,
         thumb: meal.strMealThumb,
-        instructions: meal.strInstructions,
         ingredients,
+        measures,
+        steps,
+        category: meal.strCategory,
+        area: meal.strArea,
+        youtube: meal.strYoutube,
     }
 }
