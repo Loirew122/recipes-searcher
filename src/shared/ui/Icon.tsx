@@ -1,4 +1,9 @@
-const PATHS = {
+import type { ReactNode } from 'react'
+
+export type IconName = 'heart' | 'search' | 'plus' | 'close' | 'check' |
+    'chevron' | 'back' | 'chef' | 'carrot' | 'utensils' | 'alert' | 'play'
+
+const PATHS: Record<IconName, ReactNode> = {
     heart: <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />,
     search: <><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></>,
     plus: <path d="M5 12h14M12 5v14" />,
@@ -13,7 +18,13 @@ const PATHS = {
     play: <><circle cx="12" cy="12" r="10" /><path d="m10 8 6 4-6 4Z" /></>,
 }
 
-export function Icon({ name, size = 18, filled = false }) {
+interface IconProps {
+    name: IconName
+    size?: number
+    filled?: boolean
+}
+
+export function Icon({ name, size = 18, filled = false }: IconProps) {
     return (
         <svg className="icon" width={size} height={size} viewBox="0 0 24 24"
             fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"

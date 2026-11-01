@@ -1,12 +1,12 @@
-import { useDispatch, useSelector } from "react-redux"
+import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { Button } from "@shared/ui/Button"
 import { Icon } from "@shared/ui/Icon"
 import { removeIngredient, selectIngredients } from "./IngredientsSlice"
 import "./ingredients.css"
 
 export function IngredientList(){
-    const dispatch = useDispatch()
-    const items = useSelector(selectIngredients)
+    const dispatch = useAppDispatch()
+    const items = useAppSelector(selectIngredients)
     if (items.length === 0) {
         return <p className="chips__empty">Пока пусто — впишите продукт или выберите из подсказок</p>
     }

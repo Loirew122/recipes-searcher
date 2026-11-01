@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import type { FormEvent } from 'react'
+import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { Button } from "@shared/ui/Button"
 import { Icon } from "@shared/ui/Icon"
 import { Input } from "@shared/ui/Input"
@@ -7,12 +8,12 @@ import { addIngredient, selectIngredients, selectIngredientsError } from "./Ingr
 import "./ingredients.css"
 
 export function IngredientForm(){
-    const dispatch = useDispatch()
-    const items = useSelector(selectIngredients)
-    const error = useSelector(selectIngredientsError)
+    const dispatch = useAppDispatch()
+    const items = useAppSelector(selectIngredients)
+    const error = useAppSelector(selectIngredientsError)
     const [draft, setDraft] = useState('')
 
-    function handleSubmit(event){
+    function handleSubmit(event: FormEvent<HTMLFormElement>){
         event.preventDefault()
         const name = draft.trim().toLowerCase()
         const isValid = name !== "" && !items.some((i) => i.toLowerCase() === name)

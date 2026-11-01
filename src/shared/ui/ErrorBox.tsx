@@ -2,7 +2,12 @@ import { Button } from "./Button"
 import { Icon } from "./Icon"
 import "./ErrorBox.css"
 
-export function ErrorBox({ message, onRetry }) {
+interface ErrorBoxProps {
+    message?: string
+    onRetry?: () => void
+}
+
+export function ErrorBox({ message, onRetry }: ErrorBoxProps) {
     return (
         <div className="error-box" role="alert">
             <Icon name="alert" size={28} />

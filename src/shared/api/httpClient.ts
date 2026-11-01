@@ -7,6 +7,6 @@ export const httpClient = axios.create({
 })
 
 httpClient.interceptors.request.use((config)=>{
-    console.log(config.method.toUpperCase(), `${config.baseURL}${config.url}`)
+    console.log(config.method?.toUpperCase() ?? 'GET', `${config.baseURL}${config.url}`)
     return config
 })

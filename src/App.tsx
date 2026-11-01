@@ -1,13 +1,13 @@
 import { Link, NavLink, Outlet } from "react-router-dom"
-import { useSelector } from "react-redux"
-import { selectIngredients } from "@features/ingredients/IngredientsSlice.js"
+import { useAppSelector } from '@/app/hooks'
+import { selectIngredients } from "@features/ingredients/IngredientsSlice"
 import { useGetFavoritesQuery } from "@/app/api"
 import { Icon } from "@shared/ui/Icon"
 import { plural } from "@shared/lib/plural"
 import "./App.css"
 
 function App(){
-  const ingredients = useSelector(selectIngredients)
+  const ingredients = useAppSelector(selectIngredients)
   const { data: favorites = [] } = useGetFavoritesQuery()
 
   return (
@@ -36,6 +36,8 @@ function App(){
       </main>
       <footer className="app__footer">
         Рецепты и фотографии — <a href="https://www.themealdb.com" target="_blank" rel="noreferrer">TheMealDB</a>
+        {' · '}
+        <a href={`${import.meta.env.BASE_URL}lab7-review.html`}>Разбор ЛР7</a>
       </footer>
     </div>
   )

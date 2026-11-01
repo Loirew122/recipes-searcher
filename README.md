@@ -1,16 +1,35 @@
-# React + Vite
+# Recipe AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React-приложение для поиска рецептов по имеющимся продуктам. Клиент написан на TypeScript, состояние хранится в Redux Toolkit, запросы и кеш управляются RTK Query.
 
-Currently, two official plugins are available:
+## Ссылки
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- [Открыть приложение](https://loirew122.github.io/recipes-searcher/)
+- [Интерактивный разбор ЛР7](https://loirew122.github.io/recipes-searcher/lab7-review.html)
+- [Разбор в Markdown](docs/Разбор_лабораторной_7_TypeScript.md)
 
-## React Compiler
+На GitHub Pages избранное сохраняется в `localStorage`. При локальном запуске с `VITE_FAVORITES_URL` используется Express backend.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Локальный запуск
 
-## Expanding the ESLint configuration
+```bash
+npm install
+cp .env.example .env
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Backend избранного запускается отдельно:
+
+```bash
+cd server
+npm install
+npm start
+```
+
+## Проверка
+
+```bash
+npm run typecheck
+npm run build
+npm run lint
+```

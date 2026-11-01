@@ -1,28 +1,44 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { useSelector } from "react-redux"
-import { selectIngredients } from "@features/ingredients/IngredientsSlice"
-import { selectSubmittedSearch } from "@features/recipes/searchSlice"
-import { Button } from "@shared/ui/Button"
-import { Icon } from "@shared/ui/Icon"
-import { Loader } from "@shared/ui/Loader"
-import { toEnglish, toRussian } from "@shared/lib/ingredients"
-import { FavoriteButton } from "@features/favorites/FavoriteButton"
-import { useGetRecipeQuery } from "@/app/api"
-import "./recipes.css"
+import { useState } from 'react'
+import type { CSSProperties } from 'react'
+import { Link } from 'react-router-dom'
+import { selectIngredients } from '@features/ingredients/IngredientsSlice'
+import { selectSubmittedSearch } from '@features/recipes/searchSlice'
+import { useAppSelector } from '@/app/hooks'
+import type { RecipeSearchResult } from '@shared/types/recipe'
+import { Button } from '@shared/ui/Button'
+import { Icon } from '@shared/ui/Icon'
+import { Loader } from '@shared/ui/Loader'
+import { toEnglish, toRussian } from '@shared/lib/ingredients'
+import { FavoriteButton } from '@features/favorites/FavoriteButton'
+import { useGetRecipeQuery } from '@/app/api'
+import './recipes.css'
 
-export function RecipeCard({ id, title, thumb, matched = [], index = 0 }) {
-  const userIngredients = useSelector(selectIngredients)
-  const total = useSelector(selectSubmittedSearch).length
+
+interface RecipeCardProps extends Pick<RecipeSearchResult, 'id' | 'title' | 'thumb'> {
+  matched?: RecipeSearchResult['matched']
+  index?: number
+}
+
+export function RecipeCard({
+  id,
+  title,
+  thumb,
+  matched = [],
+  index = 0,
+}: RecipeCardProps) {
+  const userIngredients = useAppSelector(selectIngredients)
+  const total = useAppSelector(selectSubmittedSearch).length
   const [open, setOpen] = useState(false)
   const { data: recipe, isLoading, isError, refetch } = useGetRecipeQuery(id, { skip: !open })
 
   const have = userIngredients.map(toEnglish)
   const missing = (recipe?.ingredients ?? []).filter((item) => !have.some((h) => item.includes(h)))
   const isFullMatch = total > 0 && matched.length === total
-
+  const cardStyle: CSSProperties & { '--i': number } = {
+    '--i': index,
+  }
   return (
-    <article className="recipe-card" style={{ "--i": index }}>
+    <article className="recipe-card" style={cardStyle}>
       <div className="recipe-card__media">
         <Link to={`/recipe/${id}`} tabIndex={-1} aria-hidden="true">
           <img className="recipe-card__image" src={thumb} alt="" loading="lazy" />

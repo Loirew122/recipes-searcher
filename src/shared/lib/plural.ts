@@ -1,4 +1,6 @@
-export function plural(count, [one, few, many]) {
+type PluralForms = readonly [one: string, few: string, many: string]
+
+export function plural(count: number, [one, few, many]: PluralForms): string {
   const mod10 = count % 10
   const mod100 = count % 100
   if (mod10 === 1 && mod100 !== 11) return one

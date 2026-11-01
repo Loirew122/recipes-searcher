@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ЛР7 · TypeScript migration</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f3efe6;
+      --ink: #1d2926;
+      --muted: #65716d;
+      --line: #c9d0c8;
+      --panel: #fffdf7;
+      --accent: #b84a2f;
+      --accent-soft: #f3d8ca;
+      --code: #17241f;
+      --code-ink: #dce9df;
+      --ok: #287454;
+      --warn: #9b5f14;
+      --shadow: 0 14px 34px rgba(34, 46, 40, .1);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+    button, a { font: inherit; }
+    a { color: inherit; }
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 860px);
+      gap: 52px;
+      max-width: 1220px;
+      padding: 34px 28px 80px;
+    }
+    .rail {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      border-top: 5px solid var(--accent);
+      padding-top: 18px;
+    }
+    .kicker {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .rail h1 {
+      margin: 10px 0 6px;
+      font-family: Georgia, serif;
+      font-size: 40px;
+      line-height: 1.03;
+    }
+    .rail p { margin: 0 0 22px; color: var(--muted); }
+    nav { display: grid; gap: 4px; }
+    nav a {
+      border-radius: 5px;
+      padding: 8px 10px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    nav a:hover, nav a:focus-visible, nav a.active {
+      background: var(--accent-soft);
+      color: var(--ink);
+      outline: none;
+    }
+    .progress {
+      height: 3px;
+      margin-top: 22px;
+      background: var(--line);
+      overflow: hidden;
+    }
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--accent);
+      transition: width 120ms linear;
+    }
+    main { min-width: 0; }
+    .lead {
+      border-bottom: 1px solid var(--line);
+      padding: 28px 0 40px;
+    }
+    .lead h2 {
+      max-width: 760px;
+      margin: 0 0 20px;
+      font-family: Georgia, serif;
+      font-size: clamp(38px, 7vw, 72px);
+      font-weight: 600;
+      letter-spacing: -.035em;
+      line-height: .98;
+    }
+    .lead p { max-width: 670px; margin: 0; color: var(--muted); font-size: 18px; }
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-block: 1px solid var(--line);
+      margin-bottom: 56px;
+    }
+    .fact { padding: 22px 14px 22px 0; }
+    .fact + .fact { border-left: 1px solid var(--line); padding-left: 18px; }
+    .fact strong { display: block; font-family: Georgia, serif; font-size: 30px; }
+    .fact span { color: var(--muted); font-size: 13px; }
+    section { scroll-margin-top: 28px; margin-bottom: 64px; }
+    section > h2 {
+      margin: 0 0 14px;
+      font-family: Georgia, serif;
+      font-size: 32px;
+      font-weight: 600;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin-top: 26px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .flow div { position: relative; padding: 22px 16px; }
+    .flow div + div { border-left: 1px solid var(--line); }
+    .flow b { display: block; margin-bottom: 7px; }
+    .flow small { color: var(--muted); }
+    .flow div:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      z-index: 2;
+      top: 20px;
+      right: -10px;
+      width: 19px;
+      background: var(--panel);
+      color: var(--accent);
+      text-align: center;
+    }
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .note {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 22px;
+    }
+    .note h3 { margin: 0 0 8px; font-size: 17px; }
+    .note p { margin: 0; color: var(--muted); }
+    .note.ok { border-top: 4px solid var(--ok); }
+    .note.warn { border-top: 4px solid var(--warn); }
+    code, pre { font-family: "DejaVu Sans Mono", Consolas, monospace; }
+    code { color: var(--accent); }
+    pre {
+      overflow-x: auto;
+      border-radius: 6px;
+      background: var(--code);
+      color: var(--code-ink);
+      padding: 20px;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); }
+    th, td { border-bottom: 1px solid var(--line); padding: 13px 12px; text-align: left; }
+    th { color: var(--muted); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); }
+    .criteria-note { margin-bottom: 18px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .filters button {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--panel);
+      color: var(--ink);
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+    .filters button[aria-pressed="true"] {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .status {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 8px;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .status--done { background: #d9eadf; color: #1d6448; }
+    .status--open { background: #f3dfbf; color: #82500e; }
+    .steps { display: grid; gap: 0; padding: 0; list-style: none; counter-reset: steps; }
+    .steps li {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 16px;
+      border-top: 1px solid var(--line);
+      padding: 20px 0;
+      counter-increment: steps;
+    }
+    .steps li::before {
+      content: counter(steps, decimal-leading-zero);
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-size: 25px;
+    }
+    .steps h3 { margin: 0 0 5px; }
+    .steps p { margin: 0; color: var(--muted); }
+    .path {
+      display: block;
+      margin: 0 0 6px;
+      color: var(--accent);
+      font-family: "DejaVu Sans Mono", Consolas, monospace;
+      font-size: 12px;
+    }
+    tr[hidden] { display: none; }
+    .review-list { display: grid; gap: 10px; padding: 0; list-style: none; }
+    .review-list li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; }
+    .review-list b { color: var(--ok); }
+    details { border-bottom: 1px solid var(--line); }
+    summary { cursor: pointer; padding: 16px 0; font-weight: 700; }
+    details p { margin: 0 0 18px; color: var(--muted); }
+    .quiz-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .quiz-actions button {
+      min-height: 44px;
+      border: 1px solid var(--ink);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--ink);
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    .quiz-actions button:hover, .quiz-actions button:focus-visible {
+      background: var(--ink);
+      color: var(--paper);
+      outline: none;
+    }
+    .status-line { margin-top: 22px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; gap: 20px; }
+      .rail { position: static; }
+      nav { grid-template-columns: repeat(3, 1fr); }
+      .flow { grid-template-columns: 1fr; }
+      .flow div + div { border-left: 0; border-top: 1px solid var(--line); }
+      .flow div:not(:last-child)::after { content: "↓"; top: auto; right: 18px; bottom: -12px; }
+    }
+    @media (max-width: 620px) {
+      .shell { padding-inline: 18px; }
+      nav, .facts { grid-template-columns: 1fr 1fr; }
+      .fact:nth-child(3) { border-left: 0; }
+      .fact:nth-child(n + 3) { border-top: 1px solid var(--line); }
+      .columns { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .progress span { transition: none; }
+    }
+    @media print {
+      .shell { display: block; max-width: none; padding: 0; }
+      .rail nav, .progress, .quiz-actions { display: none; }
+      .rail { position: static; }
+      body { background: white; color: black; font-size: 12pt; }
+      section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="kicker">Лабораторная 7</div>
+      <h1>TypeScript без магии</h1>
+      <p>Карта миграции Recipe AI и подготовка к защите.</p>
+      <nav aria-label="Разделы">
+        <a href="#result">Результат</a>
+        <a href="#criteria">Критерии</a>
+        <a href="#process">Как сделано</a>
+        <a href="#code">Разбор кода</a>
+        <a href="#boundary">API boundary</a>
+        <a href="#state">Store</a>
+        <a href="#react">React</a>
+        <a href="#review">Review</a>
+        <a href="#defense">Защита</a>
+      </nav>
+      <div class="progress" aria-hidden="true"><span></span></div>
+    </aside>
+
+    <main>
+      <header class="lead">
+        <h2>От «верим JSON» к проверяемым контрактам</h2>
+        <p>Критерии выполнения, последовательность миграции и разбор кода по файлам. Внешние данные остаются <code>unknown</code>, пока runtime guards не подтвердят их форму.</p>
+      </header>
+
+      <div class="facts" aria-label="Итоги миграции">
+        <div class="fact"><strong>32</strong><span>TS/TSX modules</span></div>
+        <div class="fact"><strong>0</strong><span>JS/JSX in src</span></div>
+        <div class="fact"><strong>130</strong><span>modules in build</span></div>
+        <div class="fact"><strong>strict</strong><span>compiler mode</span></div>
+      </div>
+
+      <section id="result">
+        <h2>Что изменилось</h2>
+        <div class="columns">
+          <article class="note ok">
+            <h3>Статические контракты</h3>
+            <p>Domain types, typed endpoints, typed hooks, props, form events и route params проверяются до запуска.</p>
+          </article>
+          <article class="note ok">
+            <h3>Runtime validation</h3>
+            <p>Axios получает <code>unknown</code>. Guards создают доверенные RecipeDetails, SearchResult и FavoriteRecipe.</p>
+          </article>
+        </div>
+        <pre><code>HTTP JSON → unknown → guards/parsers → DomainType
+          → RTK Query cache → typed hooks → React</code></pre>
+      </section>
+
+      <section id="criteria">
+        <h2>Критерии и доказательства</h2>
+        <article class="note warn criteria-note">
+          <h3>Источник критериев</h3>
+          <p>Официального условия ЛР7 в workspace нет. Ниже рабочая матрица, восстановленная по незавершённой миграции и коду. Это не выдуманная шкала преподавателя «3/4/5»; после получения задания её нужно сверить с оригиналом.</p>
+        </article>
+        <div class="filters" aria-label="Фильтр критериев">
+          <button type="button" data-filter="all" aria-pressed="true">Все</button>
+          <button type="button" data-filter="done" aria-pressed="false">Выполнено</button>
+          <button type="button" data-filter="open" aria-pressed="false">Открытые пункты</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Критерий</th><th>Статус</th><th>Код</th><th>Доказательство</th></tr></thead>
+            <tbody>
+              <tr data-criterion="done"><td>TypeScript и отдельный typecheck</td><td><span class="status status--done">готово</span></td><td>package.json, tsconfig.json</td><td>tsc --noEmit</td></tr>
+              <tr data-criterion="done"><td>Строгий режим без any/suppressions</td><td><span class="status status--done">готово</span></td><td>tsconfig.json</td><td>strict + static scan</td></tr>
+              <tr data-criterion="done"><td>Полная миграция client source</td><td><span class="status status--done">готово</span></td><td>src/**/*.ts(x)</td><td>32 TS/TSX, 0 JS/JSX</td></tr>
+              <tr data-criterion="done"><td>Единая доменная модель</td><td><span class="status status--done">готово</span></td><td>shared/types/recipe.ts</td><td>Pick, Omit, interfaces</td></tr>
+              <tr data-criterion="done"><td>Runtime validation внешнего JSON</td><td><span class="status status--done">готово</span></td><td>apiGuards, recipesApi, favoritesApi</td><td>unknown → parser → type</td></tr>
+              <tr data-criterion="done"><td>Явные Promise&lt;T&gt; API contracts</td><td><span class="status status--done">готово</span></td><td>features/*/*Api.ts</td><td>tsc</td></tr>
+              <tr data-criterion="done"><td>Typed RTK Query endpoints</td><td><span class="status status--done">готово</span></td><td>app/api.ts</td><td>result + argument generics</td></tr>
+              <tr data-criterion="done"><td>Typed store, hooks и slices</td><td><span class="status status--done">готово</span></td><td>store, hooks, slices</td><td>RootState/AppDispatch выводятся</td></tr>
+              <tr data-criterion="done"><td>Typed props, events и route params</td><td><span class="status status--done">готово</span></td><td>shared/ui, pages, features</td><td>tsc</td></tr>
+              <tr data-criterion="done"><td>Aliases совпадают с Vite</td><td><span class="status status--done">готово</span></td><td>tsconfig + vite.config</td><td>production build</td></tr>
+              <tr data-criterion="done"><td>Функциональность сохранена</td><td><span class="status status--done">статически</span></td><td>router, pages, API</td><td>build; browser заблокирован</td></tr>
+              <tr data-criterion="open"><td>Type-aware ESLint для TSX</td><td><span class="status status--open">не готово</span></td><td>eslint.config.js</td><td>нужен typescript-eslint</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="process">
+        <h2>Как я выполнял миграцию</h2>
+        <ol class="steps">
+          <li><div><h3>Снял baseline</h3><p>Проверил git status, package scripts, aliases и первый typecheck. Он нашёл пропущенный аргумент <code>renderContent</code>.</p></div></li>
+          <li><div><h3>Закончил shared-слой</h3><p>Переименовал clients, utilities и UI primitives. Затем убрал implicit any, типизировал dictionaries, native props и icon names.</p></div></li>
+          <li><div><h3>Мигрировал ingredients feature</h3><p>Добавил typed Redux hooks и <code>FormEvent&lt;HTMLFormElement&gt;</code>, сохранив прежнюю логику формы и chips.</p></div></li>
+          <li><div><h3>Закрыл pages и router</h3><p>Обработал optional route id через <code>skipToken</code>, убрал imports со старыми расширениями, сузил nullable tags.</p></div></li>
+          <li><div><h3>Удалил миграционные хвосты</h3><p>Проверил: в <code>src</code> нет JS/JSX, entry point указывает на <code>main.tsx</code>, aliases разрешаются.</p></div></li>
+          <li><div><h3>Запустил quality gate</h3><p>Выполнил typecheck, production build, static security scan и <code>git diff --check</code>. Отдельно обнаружил ограничение ESLint config.</p></div></li>
+        </ol>
+      </section>
+
+      <section id="code">
+        <h2>Разбор кода по файлам</h2>
+        <details open>
+          <summary><span class="path">tsconfig.json</span>Почему настройки строгие</summary>
+          <p><code>strict</code> включает основные проверки, а <code>noUncheckedIndexedAccess</code> заставляет учитывать <code>undefined</code> при чтении массива или объекта по key. <code>noEmit</code> оставляет сборку Vite, а TypeScript используется как отдельный анализатор.</p>
+        </details>
+        <details>
+          <summary><span class="path">shared/types/recipe.ts</span>Как собрана доменная модель</summary>
+          <p><code>RecipeBase</code> хранит общие поля. <code>RecipeDetails</code> расширяет его. <code>FavoriteRecipe</code> создаётся через <code>Pick</code>, а search result через <code>Omit</code>, поэтому структура не дублируется.</p>
+          <pre><code>type FavoriteRecipe = Pick&lt;RecipeDetails, 'id' | 'title' | 'thumb'&gt;</code></pre>
+        </details>
+        <details>
+          <summary><span class="path">apiGuards.ts + recipesApi.ts</span>Как unknown становится RecipeDetails</summary>
+          <p><code>isRecord</code> подтверждает объект, <code>requireString</code> проверяет обязательное поле, <code>nullableString</code> — optional поле. Только parser возвращает доменный type.</p>
+          <pre><code>const response = await httpClient.get&lt;unknown&gt;('/lookup.php', config)
+return toRecipeDetails(response.data)</code></pre>
+        </details>
+        <details>
+          <summary><span class="path">favoritesApi.ts</span>Как избранное работает на GitHub Pages</summary>
+          <p>Локально при наличии <code>VITE_FAVORITES_URL</code> используется Express через Axios. На статическом Pages backend недоступен, поэтому тот же API layer переключается на <code>localStorage</code>. Компоненты и RTK Query mutations остаются без изменений.</p>
+        </details>
+        <details>
+          <summary><span class="path">app/api.ts</span>Что делает toResult и generics endpoint</summary>
+          <p><code>toResult&lt;T&gt;</code> сохраняет тип Promise и преобразует exception в форму RTK Query. <code>builder.query&lt;RecipeDetails | null, string&gt;</code> связывает argument hook и тип data.</p>
+          <pre><code>type QueryResult&lt;T&gt; = { data: T } | { error: ApiError }</code></pre>
+        </details>
+        <details>
+          <summary><span class="path">store.ts + hooks.ts</span>Почему RootState не пишется вручную</summary>
+          <p><code>ReturnType&lt;typeof store.getState&gt;</code> всегда соответствует реальному reducer map. Typed hooks переносят этот тип во все компоненты без повторения generics.</p>
+        </details>
+        <details>
+          <summary><span class="path">shared/ui/*.tsx</span>Как типизированы UI primitives</summary>
+          <p>Button расширяет native button attributes; Input заменяет DOM <code>onChange</code> callback на строковый; Icon принимает только union <code>IconName</code>; EmptyState использует <code>ReactNode</code> для children.</p>
+        </details>
+        <details>
+          <summary><span class="path">RecipePage.tsx</span>Почему использован skipToken</summary>
+          <p><code>useParams()</code> возвращает <code>string | undefined</code>. Non-null assertion только скрыл бы риск, а <code>id ?? skipToken</code> реально не запускает query без id.</p>
+        </details>
+        <details>
+          <summary><span class="path">FavoritesPage.tsx</span>Зачем discriminated union и never</summary>
+          <p>Одно поле <code>status</code> задаёт loading/error/empty/ready. У каждого состояния доступны только его данные, а <code>never</code> проверяет полный switch при добавлении нового status.</p>
+        </details>
+        <details>
+          <summary><span class="path">main.tsx + router.tsx + App.tsx</span>Что осталось неизменным</summary>
+          <p>Provider, RouterProvider, маршруты и layout сохранились. Миграция изменила контракты и проверяемость, но не пользовательские сценарии.</p>
+        </details>
+      </section>
+
+      <section id="boundary">
+        <h2>Самая важная граница</h2>
+        <p>Generic <code>axios.get&lt;Recipe&gt;</code> ничего не проверяет. Он только сообщает компилятору обещанный тип. Поэтому ответ сначала принимается как <code>unknown</code>.</p>
+        <div class="flow">
+          <div><b>HTTP</b><small>неизвестный JSON</small></div>
+          <div><b>isRecord</b><small>объект ли это</small></div>
+          <div><b>requireString</b><small>поля на месте</small></div>
+          <div><b>parser</b><small>нормализация</small></div>
+          <div><b>Domain type</b><small>можно использовать</small></div>
+        </div>
+        <pre><code>const response = await httpClient.get&lt;unknown&gt;('/lookup.php', config)
+return toRecipeDetails(response.data)</code></pre>
+      </section>
+
+      <section id="state">
+        <h2>Redux без дублирования</h2>
+        <p><code>RootState</code> и <code>AppDispatch</code> выводятся из настоящего store. При изменении reducers типы обновятся автоматически.</p>
+        <pre><code>export type RootState = ReturnType&lt;typeof store.getState&gt;
+export type AppDispatch = typeof store.dispatch
+
+export const useAppDispatch = useDispatch.withTypes&lt;AppDispatch&gt;()
+export const useAppSelector = useSelector.withTypes&lt;RootState&gt;()</code></pre>
+        <table>
+          <thead><tr><th>Endpoint</th><th>Result</th><th>Argument</th></tr></thead>
+          <tbody>
+            <tr><td>searchRecipes</td><td>RecipeSearchResult[]</td><td>string[]</td></tr>
+            <tr><td>getRecipe</td><td>RecipeDetails | null</td><td>string</td></tr>
+            <tr><td>getFavorites</td><td>FavoriteRecipe[]</td><td>void</td></tr>
+            <tr><td>addFavorite</td><td>FavoriteRecipe</td><td>FavoriteRecipe</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="react">
+        <h2>Четыре приёма в React</h2>
+        <div class="columns">
+          <article class="note"><h3>skipToken</h3><p><code>id ?? skipToken</code> не отправляет запрос, если route param отсутствует.</p></article>
+          <article class="note"><h3>Native props</h3><p>Button расширяет <code>ButtonHTMLAttributes</code>, поэтому aria и events не перечисляются вручную.</p></article>
+          <article class="note"><h3>Discriminated union</h3><p>loading, error, empty и ready нельзя случайно смешать в противоречивое состояние.</p></article>
+          <article class="note"><h3>never</h3><p>Exhaustive switch станет compile-time ошибкой, если забыть новый status.</p></article>
+        </div>
+      </section>
+
+      <section id="review">
+        <h2>Code review</h2>
+        <ul class="review-list">
+          <li><b>✓</b><span>Исправлен вызов <code>renderContent(view, refetch)</code>.</span></li>
+          <li><b>✓</b><span>Optional route id обработан через <code>skipToken</code>.</span></li>
+          <li><b>✓</b><span>Удалены imports со старыми расширениями <code>.js/.jsx</code>.</span></li>
+          <li><b>✓</b><span>Security scan не нашёл secrets, eval, unsafe HTML или TS suppressions.</span></li>
+          <li><b>✓</b><span>Typecheck, production build и <code>git diff --check</code> проходят.</span></li>
+        </ul>
+        <article class="note warn">
+          <h3>Открытый tooling-пункт</h3>
+          <p>ESLint config охватывает только JS/JSX. Для полноценного TS lint нужен <code>typescript-eslint</code>; установка не разрешена. Строгий <code>tsc</code> остаётся основным анализатором.</p>
+        </article>
+        <p class="status-line">Browser smoke test не выполнен: Vite port binding заблокирован sandbox. Production build: 130 modules transformed.</p>
+      </section>
+
+      <section id="defense">
+        <h2>Проверь себя перед защитой</h2>
+        <details><summary>Почему API начинается с unknown?</summary><p>TypeScript исчезает в runtime, а generic Axios не проверяет JSON. Нужны guards и parser.</p></details>
+        <details><summary>Почему Vite build не заменяет tsc?</summary><p>Vite преобразует TypeScript, но не обязан проводить полный typecheck. Нужен отдельный <code>tsc --noEmit</code>.</p></details>
+        <details><summary>Зачем RootState выводится через ReturnType?</summary><p>Так тип соответствует реальному store и не расходится с reducer map.</p></details>
+        <details><summary>Что даёт noUncheckedIndexedAccess?</summary><p>Элемент по индексу считается потенциально отсутствующим.</p></details>
+        <details><summary>Зачем aliases есть и в tsconfig, и в Vite?</summary><p>Первый нужен компилятору, второй — bundler.</p></details>
+        <div class="quiz-actions">
+          <button type="button" id="open-all">Показать ответы</button>
+          <button type="button" id="close-all">Скрыть ответы</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const sections = [...document.querySelectorAll('main section')]
+    const links = [...document.querySelectorAll('nav a')]
+    const progress = document.querySelector('.progress span')
+
+    function updateReadingState() {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight
+      const ratio = scrollable > 0 ? window.scrollY / scrollable : 0
+      progress.style.width = `${Math.min(100, Math.max(0, ratio * 100))}%`
+
+      let active = sections[0]?.id
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= 140) active = section.id
+      }
+      for (const link of links) {
+        link.classList.toggle('active', link.hash === `#${active}`)
+      }
+    }
+
+    document.querySelector('#open-all').addEventListener('click', () => {
+      document.querySelectorAll('details').forEach((item) => { item.open = true })
+    })
+    document.querySelector('#close-all').addEventListener('click', () => {
+      document.querySelectorAll('details').forEach((item) => { item.open = false })
+    })
+
+    document.querySelectorAll('[data-filter]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const selected = button.dataset.filter
+        document.querySelectorAll('[data-filter]').forEach((item) => {
+          item.setAttribute('aria-pressed', String(item === button))
+        })
+        document.querySelectorAll('[data-criterion]').forEach((row) => {
+          row.hidden = selected !== 'all' && row.dataset.criterion !== selected
+        })
+      })
+    })
+
+    window.addEventListener('scroll', updateReadingState, { passive: true })
+    updateReadingState()
+  </script>
+</body>
+</html>

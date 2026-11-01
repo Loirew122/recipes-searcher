@@ -1,4 +1,4 @@
-const RU_TO_EN = {
+const RU_TO_EN: Record<string, string> = {
   'яйца': 'egg', 'яйцо': 'egg',
   'молоко': 'milk',
   'мука': 'flour',
@@ -17,18 +17,18 @@ const RU_TO_EN = {
   'сахар': 'sugar', 'соль': 'salt', 'перец': 'pepper', 'мёд': 'honey', 'вода': 'water',
 }
 
-const EN_TO_RU = {}
+const EN_TO_RU: Record<string, string> = {}
 for (const [ru, en] of Object.entries(RU_TO_EN)) {
   if (!(en in EN_TO_RU)) EN_TO_RU[en] = ru
 }
 
-export function toEnglish(name) {
+export function toEnglish(name: string): string {
   const key = name.trim().toLowerCase()
   // ?? берёт правую часть, только если слева undefined или null
   return RU_TO_EN[key] ?? key
 }
 
-export function toRussian(name) {
+export function toRussian(name: string): string {
   const key = name.trim().toLowerCase()
   return EN_TO_RU[key] ?? name
 }
