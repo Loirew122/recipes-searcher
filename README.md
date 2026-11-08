@@ -5,6 +5,7 @@ React-приложение для поиска рецептов по имеющ�
 ## Ссылки
 
 - [Открыть приложение](https://loirew122.github.io/recipes-searcher/)
+- [Репозиторий](https://github.com/Loirew122/recipes-searcher)
 - [Интерактивный разбор ЛР7](https://loirew122.github.io/recipes-searcher/lab7-review.html)
 - [Разбор в Markdown](docs/Разбор_лабораторной_7_TypeScript.md)
 
@@ -29,6 +30,7 @@ npm start
 ## Проверка
 
 ```bash
+npm test
 npm run typecheck
 npm run build
 npm run lint

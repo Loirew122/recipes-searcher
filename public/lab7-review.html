@@ -169,6 +169,8 @@
     th, td { border-bottom: 1px solid var(--line); padding: 13px 12px; text-align: left; }
     th { color: var(--muted); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
     .table-wrap { overflow-x: auto; border: 1px solid var(--line); }
+    .criteria-table { min-width: 1180px; }
+    .criteria-table td { vertical-align: top; }
     .criteria-note { margin-bottom: 18px; }
     .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
     .filters button {
@@ -297,9 +299,9 @@
       </header>
 
       <div class="facts" aria-label="Итоги миграции">
-        <div class="fact"><strong>32</strong><span>TS/TSX modules</span></div>
+        <div class="fact"><strong>33</strong><span>TS/TSX modules</span></div>
         <div class="fact"><strong>0</strong><span>JS/JSX in src</span></div>
-        <div class="fact"><strong>130</strong><span>modules in build</span></div>
+        <div class="fact"><strong>131</strong><span>modules in build</span></div>
         <div class="fact"><strong>strict</strong><span>compiler mode</span></div>
       </div>
 
@@ -320,32 +322,34 @@
       </section>
 
       <section id="criteria">
-        <h2>Критерии и доказательства</h2>
+        <h2>Карта реализации: где, почему и как</h2>
         <article class="note warn criteria-note">
-          <h3>Источник критериев</h3>
-          <p>Официального условия ЛР7 в workspace нет. Ниже рабочая матрица, восстановленная по незавершённой миграции и коду. Это не выдуманная шкала преподавателя «3/4/5»; после получения задания её нужно сверить с оригиналом.</p>
+          <h3>Результат проверки официальных критериев</h3>
+          <p>Условие восстановлено из предыдущей сессии. Все 16 критериев выполнены: добавлено проверяемое числовое поле, а native props переиспользуются через <code>ComponentProps</code>. Ниже показана подробная карта реализации.</p>
         </article>
         <div class="filters" aria-label="Фильтр критериев">
           <button type="button" data-filter="all" aria-pressed="true">Все</button>
           <button type="button" data-filter="done" aria-pressed="false">Выполнено</button>
-          <button type="button" data-filter="open" aria-pressed="false">Открытые пункты</button>
         </div>
         <div class="table-wrap">
-          <table>
-            <thead><tr><th>Критерий</th><th>Статус</th><th>Код</th><th>Доказательство</th></tr></thead>
+          <table class="criteria-table">
+            <thead><tr><th>Критерий</th><th>Статус</th><th>Где</th><th>Почему</th><th>Как и чем доказано</th></tr></thead>
             <tbody>
-              <tr data-criterion="done"><td>TypeScript и отдельный typecheck</td><td><span class="status status--done">готово</span></td><td>package.json, tsconfig.json</td><td>tsc --noEmit</td></tr>
-              <tr data-criterion="done"><td>Строгий режим без any/suppressions</td><td><span class="status status--done">готово</span></td><td>tsconfig.json</td><td>strict + static scan</td></tr>
-              <tr data-criterion="done"><td>Полная миграция client source</td><td><span class="status status--done">готово</span></td><td>src/**/*.ts(x)</td><td>32 TS/TSX, 0 JS/JSX</td></tr>
-              <tr data-criterion="done"><td>Единая доменная модель</td><td><span class="status status--done">готово</span></td><td>shared/types/recipe.ts</td><td>Pick, Omit, interfaces</td></tr>
-              <tr data-criterion="done"><td>Runtime validation внешнего JSON</td><td><span class="status status--done">готово</span></td><td>apiGuards, recipesApi, favoritesApi</td><td>unknown → parser → type</td></tr>
-              <tr data-criterion="done"><td>Явные Promise&lt;T&gt; API contracts</td><td><span class="status status--done">готово</span></td><td>features/*/*Api.ts</td><td>tsc</td></tr>
-              <tr data-criterion="done"><td>Typed RTK Query endpoints</td><td><span class="status status--done">готово</span></td><td>app/api.ts</td><td>result + argument generics</td></tr>
-              <tr data-criterion="done"><td>Typed store, hooks и slices</td><td><span class="status status--done">готово</span></td><td>store, hooks, slices</td><td>RootState/AppDispatch выводятся</td></tr>
-              <tr data-criterion="done"><td>Typed props, events и route params</td><td><span class="status status--done">готово</span></td><td>shared/ui, pages, features</td><td>tsc</td></tr>
-              <tr data-criterion="done"><td>Aliases совпадают с Vite</td><td><span class="status status--done">готово</span></td><td>tsconfig + vite.config</td><td>production build</td></tr>
-              <tr data-criterion="done"><td>Функциональность сохранена</td><td><span class="status status--done">статически</span></td><td>router, pages, API</td><td>build; browser заблокирован</td></tr>
-              <tr data-criterion="open"><td>Type-aware ESLint для TSX</td><td><span class="status status--open">не готово</span></td><td>eslint.config.js</td><td>нужен typescript-eslint</td></tr>
+              <tr data-criterion="done"><td>TypeScript и отдельный typecheck</td><td><span class="status status--done">готово</span></td><td><code>package.json:11</code><br><code>tsconfig.json:2–29</code></td><td>Vite преобразует TS, но не заменяет полную проверку типов.</td><td><code>tsc --noEmit</code>; команда проходит.</td></tr>
+              <tr data-criterion="done"><td>Строгий режим без обходов</td><td><span class="status status--done">готово</span></td><td><code>tsconfig.json:10–19</code></td><td>Одних расширений <code>.ts</code> недостаточно, если ошибки скрываются.</td><td><code>strict</code>, <code>noUncheckedIndexedAccess</code>; нет <code>any</code> и TS suppressions.</td></tr>
+              <tr data-criterion="done"><td>Полная миграция client source</td><td><span class="status status--done">готово</span></td><td><code>src/**/*.{ts,tsx}</code></td><td>Нетипизированный модуль создаёт разрыв в цепочке контрактов.</td><td>33 TS/TSX, 0 JS/JSX; entry point — <code>main.tsx</code>.</td></tr>
+              <tr data-criterion="done"><td>Единая доменная модель</td><td><span class="status status--done">готово</span></td><td><code>recipe.ts:1–30</code></td><td>API, store и UI должны одинаково понимать рецепт.</td><td><code>RecipeBase</code>, <code>extends</code>, <code>Pick</code>, <code>Omit</code>.</td></tr>
+              <tr data-criterion="done"><td>Runtime validation внешнего JSON</td><td><span class="status status--done">готово</span></td><td><code>apiGuards.ts</code><br><code>recipesApi.ts:10–80</code></td><td>Типы исчезают в runtime, сервер может вернуть другую форму.</td><td><code>unknown → guards → parser → DomainType</code>.</td></tr>
+              <tr data-criterion="done"><td>Явные async-контракты</td><td><span class="status status--done">готово</span></td><td><code>recipesApi.ts:83–150</code><br><code>favoritesApi.ts:42–92</code></td><td>Consumer должен знать аргументы, результат и nullable case.</td><td>Явные <code>Promise&lt;T&gt;</code>; проверено <code>tsc</code>.</td></tr>
+              <tr data-criterion="done"><td>Typed RTK Query endpoints</td><td><span class="status status--done">готово</span></td><td><code>app/api.ts:20–84</code></td><td>Тип должен пройти от API-функции до hook и JSX.</td><td>Generics <code>Result, Argument</code> для пяти endpoints.</td></tr>
+              <tr data-criterion="done"><td>Typed store, hooks и slices</td><td><span class="status status--done">готово</span></td><td><code>store.ts:6–17</code><br><code>hooks.ts:1–5</code></td><td>Ручной state type может разойтись с reducer map.</td><td><code>RootState</code>/<code>AppDispatch</code> выводятся из store.</td></tr>
+              <tr data-criterion="done"><td>Typed props, events и route params</td><td><span class="status status--done">готово</span></td><td><code>shared/ui</code>, pages, features</td><td>Границы компонентов и DOM — частые места ошибок.</td><td>Native attributes, <code>FormEvent</code>, <code>CSSProperties</code>, predicate, <code>skipToken</code>.</td></tr>
+              <tr data-criterion="done"><td>Число из поля формы</td><td><span class="status status--done">готово</span></td><td><code>HomePage.tsx</code><br><code>recipeLimit.ts</code></td><td>Numeric input возвращает строку, которую нельзя использовать как число без проверки.</td><td><code>ChangeEvent&lt;HTMLInputElement&gt;</code>, преобразование и диапазон 1–20; три unit tests.</td></tr>
+              <tr data-criterion="done"><td>ReactNode и ComponentProps</td><td><span class="status status--done">готово</span></td><td><code>EmptyState.tsx</code>, <code>Button.tsx</code>, <code>Input.tsx</code></td><td>Не дублировать стандартные React props.</td><td><code>ReactNode</code>, <code>ComponentProps&lt;'button'&gt;</code> и <code>ComponentProps&lt;'input'&gt;</code>.</td></tr>
+              <tr data-criterion="done"><td>Все состояния UI описаны</td><td><span class="status status--done">готово</span></td><td><code>FavoritesPage.tsx:12–64</code></td><td>Несколько boolean-флагов допускают противоречивое состояние.</td><td>Discriminated union и exhaustive check через <code>never</code>.</td></tr>
+              <tr data-criterion="done"><td>Aliases совпадают с Vite</td><td><span class="status status--done">готово</span></td><td><code>tsconfig.json:22–25</code><br><code>vite.config.js:12–17</code></td><td>Compiler и bundler разрешают imports независимо.</td><td>Одинаковые aliases; production build прошёл.</td></tr>
+              <tr data-criterion="done"><td>Функциональность сохранена</td><td><span class="status status--done">статически</span></td><td>router, pages, features, API</td><td>Миграция должна менять проверяемость, а не сценарии.</td><td>Typecheck и build проходят; browser test заблокирован binding порта.</td></tr>
+              <tr data-criterion="done"><td>Type-aware ESLint для TSX</td><td><span class="status status--done">готово</span></td><td><code>eslint.config.js:22–37</code><br><code>package.json:30–31</code></td><td><code>tsc</code> и lint решают разные задачи.</td><td><code>recommendedTypeChecked</code> и <code>projectService</code>; <code>npm run lint</code> проходит.</td></tr>
             </tbody>
           </table>
         </div>
@@ -359,7 +363,7 @@
           <li><div><h3>Мигрировал ingredients feature</h3><p>Добавил typed Redux hooks и <code>FormEvent&lt;HTMLFormElement&gt;</code>, сохранив прежнюю логику формы и chips.</p></div></li>
           <li><div><h3>Закрыл pages и router</h3><p>Обработал optional route id через <code>skipToken</code>, убрал imports со старыми расширениями, сузил nullable tags.</p></div></li>
           <li><div><h3>Удалил миграционные хвосты</h3><p>Проверил: в <code>src</code> нет JS/JSX, entry point указывает на <code>main.tsx</code>, aliases разрешаются.</p></div></li>
-          <li><div><h3>Запустил quality gate</h3><p>Выполнил typecheck, production build, static security scan и <code>git diff --check</code>. Отдельно обнаружил ограничение ESLint config.</p></div></li>
+          <li><div><h3>Запустил quality gate</h3><p>Выполнил type-aware lint, typecheck, production build, static security scan и <code>git diff --check</code>. ESLint нашёл необработанные Promise и нетипизированные env-переменные; причины исправлены.</p></div></li>
         </ol>
       </section>
 
@@ -448,7 +452,7 @@ export const useAppSelector = useSelector.withTypes&lt;RootState&gt;()</code></p
         <h2>Четыре приёма в React</h2>
         <div class="columns">
           <article class="note"><h3>skipToken</h3><p><code>id ?? skipToken</code> не отправляет запрос, если route param отсутствует.</p></article>
-          <article class="note"><h3>Native props</h3><p>Button расширяет <code>ButtonHTMLAttributes</code>, поэтому aria и events не перечисляются вручную.</p></article>
+          <article class="note"><h3>Native props</h3><p>Button расширяет <code>ComponentProps&lt;'button'&gt;</code>, поэтому aria и events не перечисляются вручную.</p></article>
           <article class="note"><h3>Discriminated union</h3><p>loading, error, empty и ready нельзя случайно смешать в противоречивое состояние.</p></article>
           <article class="note"><h3>never</h3><p>Exhaustive switch станет compile-time ошибкой, если забыть новый status.</p></article>
         </div>
@@ -457,21 +461,34 @@ export const useAppSelector = useSelector.withTypes&lt;RootState&gt;()</code></p
       <section id="review">
         <h2>Code review</h2>
         <ul class="review-list">
-          <li><b>✓</b><span>Исправлен вызов <code>renderContent(view, refetch)</code>.</span></li>
+          <li><b>✓</b><span>В <code>renderContent</code> передан синхронный retry-callback с явным <code>void refetch()</code>.</span></li>
           <li><b>✓</b><span>Optional route id обработан через <code>skipToken</code>.</span></li>
           <li><b>✓</b><span>Удалены imports со старыми расширениями <code>.js/.jsx</code>.</span></li>
           <li><b>✓</b><span>Security scan не нашёл secrets, eval, unsafe HTML или TS suppressions.</span></li>
-          <li><b>✓</b><span>Typecheck, production build и <code>git diff --check</code> проходят.</span></li>
+          <li><b>✓</b><span>Type-aware lint, typecheck, production build и <code>git diff --check</code> проходят.</span></li>
         </ul>
-        <article class="note warn">
-          <h3>Открытый tooling-пункт</h3>
-          <p>ESLint config охватывает только JS/JSX. Для полноценного TS lint нужен <code>typescript-eslint</code>; установка не разрешена. Строгий <code>tsc</code> остаётся основным анализатором.</p>
+        <article class="note ok">
+          <h3>Type-aware ESLint подключён</h3>
+          <p><code>typescript-eslint</code> анализирует TS/TSX с данными о типах из <code>tsconfig.json</code>. Найденные Promise и <code>ImportMetaEnv</code> исправлены без отключения правил.</p>
         </article>
-        <p class="status-line">Browser smoke test не выполнен: Vite port binding заблокирован sandbox. Production build: 130 modules transformed.</p>
+        <p class="status-line">Browser smoke test не выполнен: Vite port binding заблокирован sandbox. Unit tests, lint и typecheck проходят. Production build: 131 modules transformed.</p>
       </section>
 
       <section id="defense">
         <h2>Проверь себя перед защитой</h2>
+        <article class="note ok">
+          <h3>Короткое вступление на защите</h3>
+          <p>«В ЛР7 я мигрировал весь клиент Recipe AI на TypeScript и включил строгую проверку. Типы проходят через все слои: внешний JSON, parser, API-функции, RTK Query, Redux hooks и React-компоненты. Ответу сервера я не доверяю автоматически: он имеет тип unknown и становится RecipeDetails только после runtime-проверки. Корректность миграции подтверждают type-aware lint, tsc --noEmit и production build; пользовательские сценарии поиска, карточки и избранного сохранены».</p>
+        </article>
+        <h3>Что показать за 2–3 минуты</h3>
+        <ol class="steps">
+          <li><div><h3>Конфигурация</h3><p>Открой <code>tsconfig.json</code>: покажи <code>strict</code>, <code>noUncheckedIndexedAccess</code> и объясни, почему <code>noEmit</code> оставляет сборку Vite.</p></div></li>
+          <li><div><h3>Модель</h3><p>Открой <code>shared/types/recipe.ts</code>: объясни <code>extends</code>, <code>Pick</code> и <code>Omit</code> как защиту от дублирования.</p></div></li>
+          <li><div><h3>Граница сети</h3><p>Покажи <code>get&lt;unknown&gt;</code> в <code>recipesApi.ts</code> и переход через <code>apiGuards.ts</code> к <code>RecipeDetails</code>.</p></div></li>
+          <li><div><h3>Доставка типов в UI</h3><p>Покажи generics endpoint в <code>app/api.ts</code>, затем <code>RootState</code>, typed hooks и один компонент.</p></div></li>
+          <li><div><h3>Пограничные случаи</h3><p>Покажи <code>skipToken</code> в <code>RecipePage</code> и union состояний с <code>never</code> в <code>FavoritesPage</code>.</p></div></li>
+          <li><div><h3>Доказательство</h3><p>Запусти <code>npm test</code>, <code>npm run lint</code>, <code>npm run typecheck</code> и <code>npm run build</code>. Lint использует type-aware правила для TS/TSX.</p></div></li>
+        </ol>
         <details><summary>Почему API начинается с unknown?</summary><p>TypeScript исчезает в runtime, а generic Axios не проверяет JSON. Нужны guards и parser.</p></details>
         <details><summary>Почему Vite build не заменяет tsc?</summary><p>Vite преобразует TypeScript, но не обязан проводить полный typecheck. Нужен отдельный <code>tsc --noEmit</code>.</p></details>
         <details><summary>Зачем RootState выводится через ReturnType?</summary><p>Так тип соответствует реальному store и не расходится с reducer map.</p></details>

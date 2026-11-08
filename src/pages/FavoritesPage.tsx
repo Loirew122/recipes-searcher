@@ -92,7 +92,7 @@ export function FavoritesPage() {
           </p>
         )}
       </header>
-      {renderContent(view, refetch)}
+      {renderContent(view, () => { void refetch() })}
     </div>
   )
 }

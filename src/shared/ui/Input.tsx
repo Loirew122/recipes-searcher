@@ -1,7 +1,7 @@
-import type { InputHTMLAttributes } from 'react'
+import type { ComponentProps } from 'react'
 import './Input.css'
 
-interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
+interface InputProps extends Omit<ComponentProps<'input'>, 'onChange' | 'value'> {
     value: string
     onChange: (value: string) => void
 }

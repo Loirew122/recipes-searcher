@@ -29,9 +29,9 @@ export function FavoriteButton({
 
   function handleClick(): void {
     if (isFavorite) {
-      removeFavorite(id)
+      void removeFavorite(id)
     } else {
-      addFavorite({ id, title, thumb })
+      void addFavorite({ id, title, thumb })
     }
   }
 

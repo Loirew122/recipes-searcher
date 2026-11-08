@@ -18,7 +18,7 @@ export function RecipePage() {
   const userIngredients = useAppSelector(selectIngredients)
 
   if (isLoading) return <Loader text="Загружаем рецепт..." />
-  if (isError) return <ErrorBox message={error.message} onRetry={refetch} />
+  if (isError) return <ErrorBox message={error.message} onRetry={() => { void refetch() }} />
   if (!recipe) {
     return (
       <EmptyState icon="utensils" title="Рецепт не найден" hint="Проверьте адрес">

@@ -44,6 +44,29 @@
   font-size: 1.05rem;
 }
 
+.limit-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  align-items: center;
+  gap: 12px;
+}
+
+.limit-field__label {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.limit-field__input {
+  border-radius: 14px;
+  text-align: center;
+}
+
+.limit-field__error {
+  margin-top: -10px;
+  color: var(--danger);
+  font-size: 0.86rem;
+}
+
 .results {
   display: grid;
   gap: 20px;
@@ -74,6 +97,10 @@
 
   .hero__subtitle {
     font-size: 1rem;
+  }
+
+  .limit-field {
+    grid-template-columns: 1fr;
   }
 
   .results__title {

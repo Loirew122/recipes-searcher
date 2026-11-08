@@ -1,13 +1,13 @@
 # Лабораторная 7. Миграция Recipe AI на TypeScript
 
-Проект: `lab4-6/recipe-ai`
-Стек: React 19, Redux Toolkit, RTK Query, React Router, Axios, Vite, TypeScript 7.
+Проект: `lab4-7/recipe-ai`
+Стек: React 19, Redux Toolkit, RTK Query, React Router, Axios, Vite, TypeScript 6.
 
 ## 1. Результат
 
 Весь клиентский код из `src` переведён с JavaScript/JSX на TypeScript/TSX без изменения пользовательских сценариев.
 
-- 32 модуля `.ts` и `.tsx`;
+- 33 клиентских модуля `.ts` и `.tsx` и один declaration-файл;
 - 0 модулей `.js` и `.jsx` внутри `src`;
 - включены `strict`, `noUncheckedIndexedAccess`, `noUnusedLocals`, `noUnusedParameters`;
 - aliases Vite и TypeScript согласованы;
@@ -15,30 +15,39 @@
 - ответы API принимаются как `unknown` и проверяются до использования;
 - RTK Query endpoints типизированы по результату и аргументу;
 - props, события форм, route params и CSS custom properties типизированы;
-- `typecheck` и production build проходят.
+- type-aware lint, `typecheck` и production build проходят.
 
 Express-сервер не мигрировался: он остаётся отдельным JavaScript-приложением в `server`.
 
 ---
 
-## 2. Критерии и доказательства выполнения
+## 2. Карта реализации: где, почему и как
 
-> В workspace нет файла с официальным условием ЛР7 и шкалой преподавателя. Поэтому таблица ниже — не выдуманная оценочная ведомость «3/4/5», а рабочие критерии, восстановленные по незавершённой TypeScript-миграции и фактическому коду. Если будет исходный документ, эту таблицу нужно сверить с ним пункт в пункт.
+> Официальное условие ЛР7 восстановлено из предыдущей сессии. Точная проверка уровней «Удовлетворительно / Хорошо / Отлично» находится в заметке `ЛР 7 — TypeScript — защита за 1 день.md`. Все 16 критериев выполнены: добавлено проверяемое числовое поле и native props переведены на `ComponentProps`. Таблица ниже — подробная инженерная карта проекта.
 
-| № | Рабочий критерий | Статус | Где реализовано | Как проверено |
+| № | Критерий и статус | Где смотреть | Почему это нужно | Как сделано и доказано |
 |---:|---|---|---|---|
-| 1 | Проект подключает TypeScript и имеет отдельную команду проверки | Выполнено | `package.json`, `tsconfig.json` | `npm run typecheck` |
-| 2 | Включён строгий режим без обходов через `any` и suppressions | Выполнено | `strict`, `noUncheckedIndexedAccess`, `noUnusedLocals`, `noUnusedParameters` | `rg` не нашёл `any`, `@ts-ignore`, `@ts-expect-error` |
-| 3 | Клиентские модули мигрированы на `.ts/.tsx` | Выполнено | весь каталог `src` | 32 TS/TSX, 0 JS/JSX |
-| 4 | Создана единая доменная модель рецептов | Выполнено | `src/shared/types/recipe.ts` | типы переиспользуются API и компонентами |
-| 5 | Внешний JSON не считается доверенным автоматически | Выполнено | `apiGuards.ts`, `recipesApi.ts`, `favoritesApi.ts` | ответы Axios имеют тип `unknown`, затем проходят parser |
-| 6 | Async API-функции имеют явные `Promise<T>` | Выполнено | `recipesApi.ts`, `favoritesApi.ts` | проверено `tsc` |
-| 7 | RTK Query endpoints типизированы по result и argument | Выполнено | `src/app/api.ts` | пять endpoint contracts, hooks выводят данные |
-| 8 | Store, dispatch и selectors типизированы без дублирования формы state | Выполнено | `store.ts`, `hooks.ts`, оба slice | `RootState` и `AppDispatch` выводятся из store |
-| 9 | Props, form events, native attributes и route params типизированы | Выполнено | `shared/ui`, `IngredientForm.tsx`, `RecipePage.tsx` | `tsc --noEmit` |
-| 10 | Aliases совпадают у компилятора и bundler | Выполнено | `tsconfig.json`, `vite.config.js` | production build разрешил imports |
-| 11 | Сохранена функциональность прошлых лабораторных | Выполнено статически | router, поиск, избранное, страницы и API остались на месте | build успешен; browser smoke test заблокирован sandbox |
-| 12 | Type-aware ESLint анализирует TS/TSX | Не выполнено | текущий `eslint.config.js` охватывает только JS/JSX | нужен пакет и config `typescript-eslint` |
+| 1 | **TypeScript подключён — выполнено** | `package.json:11`, `tsconfig.json:2-29` | Vite умеет преобразовать TS в JS, но не заменяет полную проверку типов | Добавлена команда `tsc --noEmit`; `npm run typecheck` проходит |
+| 2 | **Строгий режим без обходов — выполнено** | `tsconfig.json:10-19`, весь `src` | Иначе миграция может формально иметь расширение `.ts`, но сохранять ошибки JavaScript | Включены `strict`, `noUncheckedIndexedAccess`, проверки unused; поиск не нашёл `any`, `@ts-ignore`, `@ts-expect-error` |
+| 3 | **Весь клиент мигрирован — выполнено** | каталог `src`, `index.html` | Смешанная кодовая база оставляет нетипизированные разрывы между модулями | 33 файла `.ts/.tsx`, 0 `.js/.jsx`; entry point — `main.tsx` |
+| 4 | **Единая доменная модель — выполнено** | `src/shared/types/recipe.ts:1-30` | Один контракт не даёт API, store и компонентам по-разному понимать рецепт | Общая база `RecipeBase`; детали через `extends`, поиск через `Omit`, избранное через `Pick` |
+| 5 | **Безопасная граница API — выполнено** | `apiGuards.ts:1-28`, `recipesApi.ts:10-80`, `favoritesApi.ts:8-25` | TypeScript-типы исчезают в браузере, а внешний сервер может вернуть JSON другой формы | Axios принимает `unknown`; guards и parsers проверяют данные и только затем возвращают доменный тип |
+| 6 | **Типизированные async-контракты — выполнено** | `recipesApi.ts:83-150`, `favoritesApi.ts:42-92` | Вызывающий код должен знать результат Promise и допустимые аргументы | API-функции явно возвращают `Promise<RecipeSearchResult[]>`, `Promise<RecipeDetails \| null>`, `Promise<FavoriteRecipe[]>` и другие типы |
+| 7 | **RTK Query типизирован — выполнено** | `src/app/api.ts:20-84` | Типы результата и аргумента должны дойти от API до сгенерированного React hook | Для пяти endpoints заданы generics `Result, Argument`; `toResult<T>` сохраняет тип успеха и приводит ошибку к `ApiError` |
+| 8 | **Redux store и hooks типизированы — выполнено** | `store.ts:6-17`, `hooks.ts:1-5`, оба slice | Ручное описание всего state может разойтись с реальным reducer map | `RootState` и `AppDispatch` выводятся через `typeof`; компоненты используют `useAppSelector` и `useAppDispatch` |
+| 9 | **React-контракты типизированы — выполнено** | `shared/ui/*.tsx`, `IngredientForm.tsx`, `RecipeCard.tsx`, `RecipePage.tsx:15-18` | Props, DOM events и route params — частые источники ошибок на границах компонентов | Использованы interfaces, native attribute types, `FormEvent`, `CSSProperties`, type predicate и `skipToken` |
+| 10 | **Все состояния UI описаны — выполнено** | `FavoritesPage.tsx:12-64` | Набор независимых boolean-флагов допускает противоречивые состояния | Discriminated union задаёт `loading/error/empty/ready`, а `never` проверяет полноту `switch` |
+| 11 | **Aliases согласованы — выполнено** | `tsconfig.json:22-25`, `vite.config.js:12-17` | Компилятор и bundler разрешают imports независимо друг от друга | Одинаковые `@`, `@shared`, `@features`; production build успешно разрешил все imports |
+| 12 | **Функциональность сохранена — подтверждено статически** | `router.tsx`, страницы, features, API-слой | Миграция должна менять проверяемость, а не пользовательское поведение | Маршруты, поиск, карточка и избранное сохранены; typecheck и build проходят. Browser smoke test не выполнен из-за запрета binding порта |
+| 13 | **Type-aware ESLint анализирует TS/TSX — выполнено** | `eslint.config.js:22-37`, `package.json:31-32` | `tsc` и lint находят разные классы ошибок | Подключены `typescript-eslint` и `recommendedTypeChecked` с `projectService`; `npm run lint` проходит |
+
+### Type-aware lint
+
+Для `*.ts` и `*.tsx` используется отдельный config с `typescript-eslint`. Опция `projectService: true` даёт правилам сведения о типах из `tsconfig.json`, поэтому lint обнаруживает не только синтаксические ошибки. В проекте используется совместимая связка TypeScript 6.0.3 и `typescript-eslint` 8.64.0.
+
+### Короткий ответ преподавателю о критериях
+
+> Я перевёл весь клиентский `src` на TypeScript, включил строгую проверку и провёл типы через все слои: внешний JSON, parser, API-функции, RTK Query, Redux hooks и React-компоненты. Внешним данным я не доверяю автоматически: они приходят как `unknown` и становятся доменными типами только после runtime-проверки. Миграция подтверждается type-aware lint, отдельным `tsc --noEmit` и production build; пользовательские сценарии при этом сохранены.
 
 ### Что считать обязательным минимумом перед сдачей
 
@@ -216,15 +225,29 @@ Slices используют `PayloadAction<string>` и `PayloadAction<string[]>`
 
 `FavoriteButtonProps` расширяет `FavoriteRecipe` и добавляет optional `compact`.
 
-`Button` расширяет `ButtonHTMLAttributes<HTMLButtonElement>`, поэтому поддерживает настоящие `aria-*`, `title`, `disabled`, `onClick` без ручного перечисления.
+`Button` расширяет `ComponentProps<'button'>`, поэтому поддерживает настоящие `aria-*`, `title`, `disabled`, `onClick` без ручного перечисления.
 
-`Input` берёт native props через `Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'>` и заменяет callback на удобный `(value: string) => void`.
+`Input` берёт native props через `Omit<ComponentProps<'input'>, 'onChange' | 'value'>` и заменяет callback на удобный `(value: string) => void`.
 
 ### Событие формы
 
 ```ts
 function handleSubmit(event: FormEvent<HTMLFormElement>)
 ```
+
+### Числовое поле
+
+Поле «Максимум рецептов» хранит значение как `string`, потому что `HTMLInputElement.value` возвращает строку даже при `type="number"`.
+
+```ts
+const [recipeLimitInput, setRecipeLimitInput] = useState<string>('12')
+
+function handleRecipeLimitChange(event: ChangeEvent<HTMLInputElement>): void {
+  setRecipeLimitInput(event.target.value)
+}
+```
+
+`parseRecipeLimit` преобразует строку и принимает только целые числа от 1 до 20. Пустая строка, текст, дробь и значения вне диапазона возвращают `null`. Поведение закреплено тестом `tests/recipeLimit.test.js`.
 
 ### Закрытый набор иконок
 
@@ -282,7 +305,7 @@ Intersection type расширяет стандартный `CSSProperties` ко
 FavoritesPage.tsx: Expected 2 arguments, but got 1
 ```
 
-`renderContent` принимала `view` и `onRetry`, но вызов передавал только `view`. После `renderContent(view, refetch)` typecheck стал зелёным.
+`renderContent` принимала `view` и `onRetry`, но вызов передавал только `view`. Вызов дополнен синхронным retry-callback, который явно запускает `refetch` через `void`.
 
 ### Шаг 2. Закончить shared-слой
 
@@ -290,7 +313,7 @@ FavoritesPage.tsx: Expected 2 arguments, but got 1
 
 - `Record<string, string>` для словарей продуктов;
 - tuple из трёх словоформ для `plural`;
-- `ButtonHTMLAttributes` и `InputHTMLAttributes` для native props;
+- `ComponentProps<'button'>` и `ComponentProps<'input'>` для native props;
 - union `IconName` для допустимых иконок;
 - optional chaining для `config.method` в Axios interceptor.
 
@@ -315,6 +338,7 @@ Shared шёл первым, потому что feature-компоненты з�
 ### Шаг 6. Финальный gate
 
 ```bash
+npm test
 npm run typecheck
 npm run build
 npm run lint
@@ -482,13 +506,15 @@ const query = useGetRecipeQuery(id ?? skipToken)
 
 ## 13. Найденные и исправленные проблемы
 
-1. **Пропущенный аргумент.** `renderContent` ожидал `view` и `onRetry`, но вызывался только с `view`. Вызов исправлен на `renderContent(view, refetch)`.
+1. **Пропущенный аргумент.** `renderContent` ожидал `view` и `onRetry`, но вызывался только с `view`. Добавлен синхронный retry-callback с явным `void refetch()`.
 2. **Optional route param.** `useGetRecipeQuery(id)` заменён на безопасный вызов со `skipToken`.
 3. **Нетипизированные Redux hooks.** Оставшиеся `useDispatch`/`useSelector` заменены на project hooks.
 4. **Неудачное имя hook.** `useAllSelector` переименован в стандартное `useAppSelector`.
 5. **Старые import extensions.** Удалены ссылки на `.js/.jsx`; production build подтвердил разрешение модулей.
 6. **Орфография.** `ингридиент` исправлено на `ингредиент`.
-7. **Ложный lint gate.** ESLint config охватывает только JS/JSX. После миграции `npm run lint` не анализирует TS/TSX. Для этого нужен `typescript-eslint`; установка не выполнена, потому что сетевое разрешение было отклонено, а offline cache неполный. Основной анализатор TS — строгий `tsc`.
+7. **Неохваченный TS lint.** Изначально ESLint config охватывал только JS/JSX. Подключён type-aware config для TS/TSX; он нашёл необработанные Promise в UI callbacks и `any` из `import.meta.env`.
+8. **Необработанные Promise.** RTK Query callbacks обёрнуты синхронными обработчиками с явным `void`, поэтому React получает `() => void`, а намеренное игнорирование результата видно анализатору.
+9. **Нетипизированные env-переменные.** Добавлен строгий `ImportMetaEnv` для `VITE_API_URL` и `VITE_FAVORITES_URL`; значения больше не протекают в приложение как `any`.
 
 ---
 
@@ -503,6 +529,7 @@ API data не приводятся через `as` к доверенному т�
 ### Correctness
 
 - `typecheck` проходит;
+- type-aware ESLint для TS/TSX проходит;
 - production build проходит;
 - `git diff --check` не находит whitespace errors;
 - imports со старыми `.js/.jsx` отсутствуют;
@@ -531,8 +558,8 @@ git diff --check
 Фактический результат:
 
 - `tsc --noEmit` — успешно;
-- Vite — 130 modules transformed, build создан;
-- ESLint — успешно только для охватываемых JS/JSX; TS/TSX пока не входит в config;
+- Vite — 131 modules transformed, build создан;
+- ESLint — успешно, включая type-aware правила для TS/TSX;
 - `git diff --check` — успешно.
 
 ---

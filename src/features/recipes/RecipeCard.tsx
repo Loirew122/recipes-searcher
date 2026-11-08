@@ -70,7 +70,7 @@ export function RecipeCard({
             {isError && (
               <>
                 <p className="recipe-card__status recipe-card__status--missing">Не удалось загрузить состав</p>
-                <Button variant="ghost" onClick={refetch}>Повторить</Button>
+                <Button variant="ghost" onClick={() => { void refetch() }}>Повторить</Button>
               </>
             )}
             {recipe && (

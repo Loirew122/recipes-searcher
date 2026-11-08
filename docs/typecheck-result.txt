@@ -1,0 +1,5 @@
+Command: npm run typecheck
+Result: success
+
+npm notice run recipe-ai@0.0.0 typecheck
+npm notice run tsc --noEmit
